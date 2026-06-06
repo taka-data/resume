@@ -1,0 +1,48 @@
+name: Export README to PDF
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - readme.md
+      - .github/workflows/export-readme-pdf.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-pdf:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install Pandoc and LaTeX dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc texlive-xetex texlive-lang-japanese fonts-noto-cjk
+
+      - name: Create PDF output directory
+        run: mkdir -p dist
+
+      - name: Export README as PDF
+        run: |
+          pandoc readme.md \
+            --from markdown \
+            --to pdf \
+            --pdf-engine=xelatex \
+            -V mainfont="Noto Serif CJK JP" \
+            -V sansfont="Noto Sans CJK JP" \
+            -V monofont="Noto Sans Mono CJK JP" \
+            -V geometry:margin=20mm \
+            -o dist/resume.pdf
+
+      - name: Upload PDF artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: resume-pdf
+          path: dist/resume.pdf
+          if-no-files-found: error
