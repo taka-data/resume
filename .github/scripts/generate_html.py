@@ -7,12 +7,12 @@ with open("/tmp/body.html", "r", encoding="utf-8") as f:
     body = f.read()
 
 css = """
-@page { size: A4; margin: 20mm 25mm; }
+@page { size: A4; margin: 12mm 15mm; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   font-family: "Noto Sans CJK JP", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
   font-size: 10.5pt;
-  line-height: 1.9;
+  line-height: 1.7;
   color: #1a1a1a;
   background: #f0f2f5;
 }
@@ -53,13 +53,13 @@ h2 {
   color: #1e293b;
   border-left: 4px solid #e11d48;
   padding-left: 12px;
-  margin: 44px 0 16px;
+  margin: 28px 0 10px;
 }
-h3 { font-size: 1.05em; color: #334155; margin: 24px 0 8px; }
-p { margin: 10px 0; }
-ul, ol { margin: 10px 0 10px 24px; }
-li { margin: 4px 0; }
-hr { border: none; border-top: 1px solid #e2e8f0; margin: 36px 0; }
+h3 { font-size: 1.05em; color: #334155; margin: 16px 0 6px; }
+p { margin: 6px 0; }
+ul, ol { margin: 6px 0 6px 24px; }
+li { margin: 2px 0; }
+hr { border: none; border-top: 1px solid #e2e8f0; margin: 20px 0; }
 table { border-collapse: collapse; width: 100%; margin: 16px 0; font-size: 0.95em; }
 th, td { border: 1px solid #e2e8f0; padding: 10px 14px; text-align: left; }
 th { background: #f8fafc; font-weight: bold; color: #475569; }
@@ -81,7 +81,7 @@ strong { color: #1e293b; }
     padding: 0;
     max-width: 100%;
   }
-  h2 { margin-top: 24pt; }
+  h2 { margin-top: 16pt; }
   a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 768px) {
