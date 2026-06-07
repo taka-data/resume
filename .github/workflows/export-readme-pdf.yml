@@ -6,6 +6,7 @@ on:
     paths:
       - readme.md
       - .github/workflows/**
+      - .github/scripts/**
   workflow_dispatch:
 
 permissions:
@@ -26,156 +27,29 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -q
-          sudo apt-get install -y pandoc texlive-xetex texlive-lang-japanese fonts-noto-cjk
+          sudo apt-get install -y pandoc fonts-noto-cjk
 
       - name: Create output directory
         run: mkdir -p dist
-
-      - name: Generate PDF
-        run: |
-          pandoc readme.md \
-            --from markdown \
-            --pdf-engine=xelatex \
-            -V mainfont="Noto Serif CJK JP" \
-            -V sansfont="Noto Sans CJK JP" \
-            -V monofont="Noto Sans Mono CJK JP" \
-            -V geometry:margin=20mm \
-            -o dist/resume.pdf
 
       - name: Generate HTML page
         env:
           REPO: ${{ github.repository }}
         run: |
-          PDF_URL="https://github.com/${REPO}/releases/latest/download/resume.pdf"
           pandoc readme.md --from markdown --to html5 -o /tmp/body.html
-          export PDF_URL
-          python3 << 'PYEOF'
-          import os
+          PDF_URL="https://github.com/${REPO}/releases/latest/download/resume.pdf" \
+            python3 .github/scripts/generate_html.py
 
-          pdf_url = os.environ['PDF_URL']
-          with open('/tmp/body.html', 'r', encoding='utf-8') as f:
-              body = f.read()
-
-          css = """
-          * { box-sizing: border-box; margin: 0; padding: 0; }
-          body {
-            font-family: "Hiragino Kaku Gothic ProN", "Noto Sans CJK JP", "Yu Gothic", sans-serif;
-            font-size: 16px;
-            line-height: 1.8;
-            color: #1a1a1a;
-            background: #f0f2f5;
-          }
-          .site-header {
-            background: #1e293b;
-            padding: 14px 24px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-          }
-          .site-header span {
-            color: #94a3b8;
-            font-size: 14px;
-          }
-          .download-btn {
-            display: inline-block;
-            background: #e11d48;
-            color: white;
-            padding: 9px 22px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: bold;
-            letter-spacing: 0.03em;
-            transition: background 0.2s;
-          }
-          .download-btn:hover { background: #be123c; }
-          .content {
-            max-width: 860px;
-            margin: 40px auto;
-            background: white;
-            padding: 52px 60px;
-            border-radius: 10px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.07);
-          }
-          h1 {
-            font-size: 1.9em;
-            color: #1e293b;
-            margin-bottom: 6px;
-          }
-          h2 {
-            font-size: 1.25em;
-            color: #1e293b;
-            border-left: 4px solid #e11d48;
-            padding-left: 12px;
-            margin: 44px 0 16px;
-          }
-          h3 {
-            font-size: 1.05em;
-            color: #334155;
-            margin: 24px 0 8px;
-          }
-          p { margin: 10px 0; }
-          ul, ol { margin: 10px 0 10px 24px; }
-          li { margin: 4px 0; }
-          hr {
-            border: none;
-            border-top: 1px solid #e2e8f0;
-            margin: 36px 0;
-          }
-          table {
-            border-collapse: collapse;
-            width: 100%;
-            margin: 16px 0;
-            font-size: 0.95em;
-          }
-          th, td {
-            border: 1px solid #e2e8f0;
-            padding: 10px 14px;
-            text-align: left;
-          }
-          th { background: #f8fafc; font-weight: bold; color: #475569; }
-          tr:nth-child(even) td { background: #fafafa; }
-          code {
-            background: #f1f5f9;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.88em;
-            font-family: "SFMono-Regular", Consolas, monospace;
-          }
-          strong { color: #1e293b; }
-          @media (max-width: 768px) {
-            .content { padding: 28px 20px; margin: 16px; }
-            h1 { font-size: 1.4em; }
-            h2 { font-size: 1.1em; }
-          }
-          """
-
-          html = f"""<!DOCTYPE html>
-          <html lang="ja">
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1">
-            <title>職務経歴書</title>
-            <style>{css}</style>
-          </head>
-          <body>
-            <header class="site-header">
-              <span>職務経歴書</span>
-              <a href="{pdf_url}" class="download-btn" download>PDF ダウンロード</a>
-            </header>
-            <main class="content">
-              {body}
-            </main>
-          </body>
-          </html>"""
-
-          with open('dist/index.html', 'w', encoding='utf-8') as f:
-              f.write(html)
-          print("HTML generated successfully")
-          PYEOF
+      - name: Generate PDF via headless Chrome
+        run: |
+          google-chrome-stable \
+            --headless=new \
+            --disable-gpu \
+            --no-sandbox \
+            --run-all-compositor-stages-before-draw \
+            --print-to-pdf="$(pwd)/dist/resume.pdf" \
+            --no-pdf-header-footer \
+            "file://$(pwd)/dist/index.html"
 
       - name: Publish to GitHub Releases
         uses: softprops/action-gh-release@v2
