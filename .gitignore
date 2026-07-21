@@ -1,0 +1,11 @@
+latex/resume.tex
+latex/*.aux
+latex/*.log
+latex/*.out
+latex/*.fls
+latex/*.fdb_latexmk
+latex/*.xdv
+latex/*.pdf
+latex/*.xmpi
+latex/*.xmpdata
+dist/
