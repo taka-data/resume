@@ -43,9 +43,11 @@
 \if@withhyper\toggletrue{withhyper}\fi
 % v1.7.3 Load xcolor early to avoid receiving `hyperref` option from pdfx package
 \RequirePackage{xcolor}
-%% v1.3.2 Hopefully this helps make the PDF
-%% file more 'friendly' with copy-paste etc
-\RequirePackage[a-1b]{pdfx}
+%% Upstream loads pdfx here for PDF/A compliance, but pdfx's CreationDate
+%% handling errors out without shell-escape on some TeX Live builds and we
+%% don't need PDF/A validation, so load plain hyperref instead (pdfx would
+%% have loaded this anyway).
+\RequirePackage{hyperref}
 \RequirePackage{accsupp}
 %% v1.7.3 Avoid 'Token not allowed' when \\ used with accsupp
 \pdfstringdefDisableCommands{
