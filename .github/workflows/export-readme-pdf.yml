@@ -29,7 +29,8 @@ jobs:
         run: |
           sudo apt-get update -q
           sudo apt-get install -y pandoc fonts-noto-cjk \
-            texlive-xetex texlive-latex-extra texlive-fonts-extra latexmk
+            texlive-xetex texlive-latex-extra texlive-fonts-extra \
+            texlive-lang-chinese latexmk
           pip install jinja2
 
       - name: Create output directory
